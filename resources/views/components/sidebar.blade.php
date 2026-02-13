@@ -18,7 +18,6 @@
         $revisiCount = PengajuanPrestasi::where('mahasiswa_id', Auth::id())->where('status', 'revisi')->count();
     }
 @endphp
-
 <aside id="sidebar"
     class="sidebar w-64 bg-gradient-to-b from-simawa-500 to-simawa-800 text-white fixed h-full z-40 overflow-y-auto">
     <!-- Logo -->
