@@ -24,34 +24,65 @@
     <div class="mb-8">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Formulir Tersedia</h3>
 
-        @if($formulirs->count() > 0)
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($formulirs as $formulir)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-all">
-                        <div class="flex items-start gap-3 mb-3">
-                            <div
-                                class="w-12 h-12 rounded-lg bg-gradient-to-br from-simawa-100 to-simawa-200 flex items-center justify-center flex-shrink-0">
-                                <ion-icon name="document-text-outline" class="text-simawa-600 text-xl"></ion-icon>
+        @if($tahunList->count() > 0)
+            <div class="space-y-4">
+                @foreach($tahunList as $thn)
+                    @php
+                        $formulirsByYear = $allFormulirs->filter(function($item) use ($thn) {
+                            return $item->tahun == $thn;
+                        });
+                        $count = $formulirsByYear->count();
+                    @endphp
+
+                    <div class="bg-white rounded-xl shadow-md border-0 overflow-hidden">
+                        <!-- Accordion Header -->
+                        <button onclick="toggleAccordion('tahun-{{ $thn }}')"
+                                class="w-full px-5 py-4 flex items-center justify-between bg-gradient-to-r from-simawa-600 to-simawa-700 hover:from-simawa-700 hover:to-simawa-800 transition-all">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                    <ion-icon name="calendar-outline" class="text-white text-xl"></ion-icon>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-semibold text-white text-lg">Tahun {{ $thn }}</h4>
+                                    <p class="text-sm text-white/80">{{ $count }} Formulir Tersedia</p>
+                                </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold text-gray-800 truncate">{{ $formulir->judul }}</h4>
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mt-1">
-                                    {{ $formulir->kategoriPrestasi->nama }}
-                                </span>
+                            <ion-icon name="chevron-down-outline" id="icon-tahun-{{ $thn }}" class="text-white/80 text-xl transition-transform"></ion-icon>
+                        </button>
+
+                        <!-- Accordion Content -->
+                        <div id="tahun-{{ $thn }}" class="hidden border-t border-gray-100">
+                            <div class="p-5">
+                                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    @foreach($formulirsByYear as $formulir)
+                                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-all">
+                                            <div class="flex items-start gap-3 mb-3">
+                                                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-simawa-100 to-simawa-200 flex items-center justify-center flex-shrink-0">
+                                                    <ion-icon name="document-text-outline" class="text-simawa-600 text-xl"></ion-icon>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="font-semibold text-gray-800 truncate">{{ $formulir->judul }}</h4>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 mt-1">
+                                                        {{ $formulir->kategoriPrestasi->nama }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                                                <span class="flex items-center gap-1">
+                                                    <ion-icon name="help-circle-outline"></ion-icon>
+                                                    {{ $formulir->pertanyaans->count() }} Pertanyaan
+                                                </span>
+                                            </div>
+                                            <a href="{{ route('mahasiswa.prestasi.create', $formulir) }}"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
+                                                <ion-icon name="add-circle-outline"></ion-icon>
+                                                Ajukan Prestasi
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                            <span class="flex items-center gap-1">
-                                <ion-icon name="help-circle-outline"></ion-icon>
-                                {{ $formulir->pertanyaans->count() }} Pertanyaan
-                            </span>
-                        </div>
-                        <a href="{{ route('mahasiswa.prestasi.create', $formulir) }}"
-                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                            Ajukan Prestasi
-                        </a>
                     </div>
                 @endforeach
             </div>
@@ -144,5 +175,19 @@
                 });
             }
         });
+
+        // Accordion toggle function
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
     </script>
 @endpush

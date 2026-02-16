@@ -17,6 +17,7 @@ class FormulirPrestasi extends Model
     protected $fillable = [
         'judul',
         'kategori_prestasi_id',
+        'tahun',
         'is_active',
     ];
 

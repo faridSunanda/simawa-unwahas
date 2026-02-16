@@ -47,6 +47,7 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
     Route::post('/formulir-prestasi', [FormulirPrestasiController::class, 'store'])->name('formulir-prestasi.store');
     Route::put('/formulir-prestasi/{formulirPrestasi}', [FormulirPrestasiController::class, 'update'])->name('formulir-prestasi.update');
     Route::delete('/formulir-prestasi/{formulirPrestasi}', [FormulirPrestasiController::class, 'destroy'])->name('formulir-prestasi.destroy');
+    Route::patch('/formulir-prestasi/{id}/toggle', [FormulirPrestasiController::class, 'toggleVisibility'])->name('formulir-prestasi.toggle-visibility');
 
     // Verifikasi Prestasi
     Route::get('/verifikasi-prestasi', [VerifikasiPrestasiController::class, 'index'])->name('verifikasi-prestasi.index');

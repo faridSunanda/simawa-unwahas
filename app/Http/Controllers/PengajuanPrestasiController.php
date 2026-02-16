@@ -17,17 +17,25 @@ class PengajuanPrestasiController extends Controller
      */
     public function index()
     {
-        $formulirs = FormulirPrestasi::with('kategoriPrestasi')
+        // Get all active formulirs for grouping by year
+        $allFormulirs = FormulirPrestasi::with(['kategoriPrestasi', 'pertanyaans'])
             ->where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // Get unique years for filter (dari kolom tahun)
+        $tahunList = $allFormulirs->pluck('tahun')
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
 
         $pengajuans = PengajuanPrestasi::with(['formulirPrestasi.kategoriPrestasi'])
             ->where('mahasiswa_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('mahasiswa.prestasi.index', compact('formulirs', 'pengajuans'));
+        return view('mahasiswa.prestasi.index', compact('allFormulirs', 'tahunList', 'pengajuans'));
     }
 
     /**

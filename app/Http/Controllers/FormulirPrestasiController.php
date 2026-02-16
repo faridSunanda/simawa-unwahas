@@ -13,15 +13,34 @@ class FormulirPrestasiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $formulirs = FormulirPrestasi::with(['kategoriPrestasi', 'pertanyaans'])
+        $tahun = $request->get('tahun');
+        
+        // Get unique years for filter (dari kolom tahun)
+        $tahunList = FormulirPrestasi::select('tahun')
+            ->distinct()
+            ->whereNotNull('tahun')
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+        
+        // Get all formulirs for counting
+        $allFormulirs = FormulirPrestasi::with(['kategoriPrestasi', 'pertanyaans'])
             ->orderBy('created_at', 'desc')
             ->get();
+        
+        // Filter by tahun if selected
+        if ($tahun) {
+            $formulirs = $allFormulirs->filter(function ($item) use ($tahun) {
+                return $item->tahun == $tahun;
+            });
+        } else {
+            $formulirs = $allFormulirs;
+        }
 
         $categories = KategoriPrestasi::where('is_active', true)->get();
 
-        return view('superadmin.formulir-prestasi.index', compact('formulirs', 'categories'));
+        return view('superadmin.formulir-prestasi.index', compact('formulirs', 'categories', 'tahunList', 'tahun', 'allFormulirs'));
     }
 
     /**
@@ -32,6 +51,7 @@ class FormulirPrestasiController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'kategori_prestasi_id' => 'required|exists:kategori_prestasis,id',
+            'tahun' => 'required|integer|min:2020|max:2030',
             'pertanyaans' => 'required|array|min:1',
             'pertanyaans.*.pertanyaan' => 'required|string|max:255',
             'pertanyaans.*.tipe' => 'required|in:text,dropdown,file',
@@ -43,6 +63,7 @@ class FormulirPrestasiController extends Controller
             $formulir = FormulirPrestasi::create([
                 'judul' => $validated['judul'],
                 'kategori_prestasi_id' => $validated['kategori_prestasi_id'],
+                'tahun' => $validated['tahun'],
             ]);
 
             foreach ($validated['pertanyaans'] as $index => $pertanyaan) {
@@ -72,6 +93,7 @@ class FormulirPrestasiController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'kategori_prestasi_id' => 'required|exists:kategori_prestasis,id',
+            'tahun' => 'required|integer|min:2020|max:2030',
             'pertanyaans' => 'required|array|min:1',
             'pertanyaans.*.pertanyaan' => 'required|string|max:255',
             'pertanyaans.*.tipe' => 'required|in:text,dropdown,file',
@@ -83,6 +105,7 @@ class FormulirPrestasiController extends Controller
             $formulirPrestasi->update([
                 'judul' => $validated['judul'],
                 'kategori_prestasi_id' => $validated['kategori_prestasi_id'],
+                'tahun' => $validated['tahun'],
             ]);
 
             // Delete existing questions and recreate
@@ -125,5 +148,15 @@ class FormulirPrestasiController extends Controller
     {
         $formulirPrestasi->load('pertanyaans');
         return response()->json($formulirPrestasi);
+    }
+
+    public function toggleVisibility($id)
+    {
+        $formulir = FormulirPrestasi::findOrFail($id);
+        $formulir->is_active = !$formulir->is_active;
+        $formulir->save();
+
+        $status = $formulir->is_active ? 'diaktifkan' : 'disembunyikan';
+        return redirect()->back()->with('success', "Formulir prestasi berhasil {$status}!");
     }
 }
