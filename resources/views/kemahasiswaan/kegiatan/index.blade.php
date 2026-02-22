@@ -85,15 +85,15 @@
                                     <ion-icon name="trash-outline" class="text-red-500"></ion-icon>Hapus
                                 </button>
                                 <div class="border-t border-gray-100 my-1"></div>
-                                <a href="{{ route('superadmin.kegiatan.peserta', $kegiatan) }}"
+                                <a href="{{ route('kemahasiswaan.kegiatan.peserta', $kegiatan) }}"
                                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <ion-icon name="people-outline" class="text-blue-500"></ion-icon>Lihat Peserta
                                 </a>
-                                <a href="{{ route('superadmin.kegiatan.sertifikat', $kegiatan) }}"
+                                <a href="{{ route('kemahasiswaan.kegiatan.sertifikat', $kegiatan) }}"
                                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <ion-icon name="ribbon-outline" class="text-purple-500"></ion-icon>Sertifikat
                                 </a>
-                                <a href="{{ route('superadmin.kegiatan.rundown', $kegiatan) }}"
+                                <a href="{{ route('kemahasiswaan.kegiatan.rundown', $kegiatan) }}"
                                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <ion-icon name="list-outline" class="text-emerald-500"></ion-icon>Rundown
                                 </a>
@@ -201,16 +201,16 @@
                     <ion-icon name="trash-outline" class="text-red-500"></ion-icon>Hapus
                 </button>
                 <div class="border-t border-gray-100 my-1"></div>
-                <a href="{{ route('superadmin.kegiatan.peserta', $kegiatan) }}"
+                <a href="{{ route('kemahasiswaan.kegiatan.peserta', $kegiatan) }}"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                     <ion-icon name="people-outline" class="text-blue-500"></ion-icon>Peserta
                     ({{ $kegiatan->peserta_count }})
                 </a>
-                <a href="{{ route('superadmin.kegiatan.sertifikat', $kegiatan) }}"
+                <a href="{{ route('kemahasiswaan.kegiatan.sertifikat', $kegiatan) }}"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                     <ion-icon name="ribbon-outline" class="text-purple-500"></ion-icon>Sertifikat
                 </a>
-                <a href="{{ route('superadmin.kegiatan.rundown', $kegiatan) }}"
+                <a href="{{ route('kemahasiswaan.kegiatan.rundown', $kegiatan) }}"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                     <ion-icon name="list-outline" class="text-emerald-500"></ion-icon>Rundown
                     ({{ $kegiatan->rundowns_count }})
@@ -236,7 +236,7 @@
                     <h3 id="modalTitle" class="text-lg font-semibold text-gray-800">Tambah Kegiatan</h3>
                     <p class="text-sm text-gray-500 mt-1">Isi form berikut untuk menambahkan kegiatan baru</p>
                 </div>
-                <form id="kegiatanForm" method="POST" action="{{ route('superadmin.kegiatan.store') }}"
+                <form id="kegiatanForm" method="POST" action="{{ route('kemahasiswaan.kegiatan.store') }}"
                     class="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-180px)]">
                     @csrf
                     <input type="hidden" name="_method" id="formMethod" value="POST">
@@ -378,8 +378,8 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const baseUrl = "{{ route('superadmin.kegiatan.index') }}";
-            const storeUrl = "{{ route('superadmin.kegiatan.store') }}";
+            const baseUrl = "{{ route('kemahasiswaan.kegiatan.index') }}";
+            const storeUrl = "{{ route('kemahasiswaan.kegiatan.store') }}";
 
             const modal = document.getElementById('modal');
             const deleteModal = document.getElementById('deleteModal');

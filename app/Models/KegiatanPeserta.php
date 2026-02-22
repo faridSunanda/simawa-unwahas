@@ -17,6 +17,7 @@ class KegiatanPeserta extends Model
         'mahasiswa_id',
         'status_presensi',
         'waktu_presensi',
+        'status',
     ];
 
     protected $casts = [
@@ -37,5 +38,33 @@ class KegiatanPeserta extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class);
+    }
+
+    /**
+     * Get the jawabans for this peserta.
+     */
+    public function jawabans()
+    {
+        return $this->hasMany(KegiatanJawabanPeserta::class , 'kegiatan_peserta_id');
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        return match ($this->status) {
+                'menunggu' => 'Menunggu Verifikasi',
+                'terdaftar' => 'Terdaftar (Diterima)',
+                'ditolak' => 'Ditolak',
+                default => 'Unknown',
+            };
+    }
+
+    public function getStatusBadgeAttribute()
+    {
+        return match ($this->status) {
+                'menunggu' => 'bg-amber-100 text-amber-700',
+                'terdaftar' => 'bg-green-100 text-green-700',
+                'ditolak' => 'bg-red-100 text-red-700',
+                default => 'bg-gray-100 text-gray-700',
+            };
     }
 }

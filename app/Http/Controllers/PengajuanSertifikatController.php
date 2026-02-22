@@ -8,18 +8,44 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 
 class PengajuanSertifikatController extends Controller
 {
-    public function index()
-    {
-        $jenisSertifikats = JenisSertifikat::where('is_active', true)->get();
-        $pengajuans = PengajuanSertifikat::where('mahasiswa_id', Auth::id())
-            ->with('jenisSertifikat')
-            ->orderBy('created_at', 'desc')
-            ->get();
 
-        return view('mahasiswa.sertifikat.index', compact('jenisSertifikats', 'pengajuans'));
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = PengajuanSertifikat::with('jenisSertifikat')
+                ->where('mahasiswa_id', Auth::id())
+                ->orderBy('created_at', 'desc');
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->editColumn('tanggal_terbit', function ($row) {
+                    return $row->tanggal_terbit ? $row->tanggal_terbit->format('d M Y') : '-';
+                })
+                ->addColumn('jenis_sertifikat', function ($row) {
+                    return $row->jenisSertifikat ? $row->jenisSertifikat->nama : '-';
+                })
+                ->editColumn('status', function ($row) {
+                    return '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ' . $row->status_badge . '">' . $row->status_label . '</span>';
+                })
+                ->addColumn('action', function ($row) {
+                    $detailBtn = '<button onclick="showDetail(\'' . route('mahasiswa.sertifikat.show', $row->id) . '\')" class="inline-flex items-center justify-center w-8 h-8 bg-simawa-50 text-simawa-600 rounded-lg hover:bg-simawa-600 hover:text-white transition-all" title="Detail"><ion-icon name="eye-outline"></ion-icon></button>';
+                    
+                    $editBtn = '';
+                    if ($row->status !== 'diterima') {
+                        $editBtn = '<button onclick="showEdit(\'' . route('mahasiswa.sertifikat.edit', $row->id) . '\')" class="inline-flex items-center justify-center w-8 h-8 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-all" title="Edit"><ion-icon name="create-outline"></ion-icon></button>';
+                    }
+
+                    return '<div class="flex gap-2 justify-center">' . $detailBtn . $editBtn . '</div>';
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+
+        return view('mahasiswa.sertifikat.index');
     }
 
     public function create()
@@ -68,6 +94,10 @@ class PengajuanSertifikatController extends Controller
             abort(403);
         }
 
+        if (request()->ajax()) {
+            return view('mahasiswa.sertifikat.show_partial', compact('sertifikat'));
+        }
+
         return view('mahasiswa.sertifikat.show', compact('sertifikat'));
     }
 
@@ -84,6 +114,11 @@ class PengajuanSertifikatController extends Controller
         }
 
         $jenisSertifikats = JenisSertifikat::where('is_active', true)->get();
+        
+        if (request()->ajax()) {
+            return view('mahasiswa.sertifikat.edit_partial', compact('sertifikat', 'jenisSertifikats'));
+        }
+
         return view('mahasiswa.sertifikat.edit', compact('sertifikat', 'jenisSertifikats'));
     }
 
@@ -126,6 +161,10 @@ class PengajuanSertifikatController extends Controller
                 'verified_at' => null,
             ]);
         });
+
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Pengajuan berhasil diperbarui']);
+        }
 
         return redirect()->route('mahasiswa.sertifikat.index')
             ->with('success', 'Pengajuan sertifikat berhasil diperbarui');

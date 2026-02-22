@@ -16,7 +16,9 @@ class Kegiatan extends Model
         'waktu_mulai',
         'waktu_selesai',
         'tampilkan',
+        'presensi',
         'pendaftaran',
+        'opsi_formulir',
         'sertifikat_template',
     ];
 
@@ -24,7 +26,14 @@ class Kegiatan extends Model
         'waktu_mulai' => 'datetime',
         'waktu_selesai' => 'datetime',
         'tampilkan' => 'boolean',
+        'presensi' => 'boolean',
+        'opsi_formulir' => 'boolean',
     ];
+
+    public function pertanyaans()
+    {
+        return $this->hasMany(KegiatanPertanyaan::class)->orderBy('id');
+    }
 
     public function peserta()
     {
@@ -38,7 +47,7 @@ class Kegiatan extends Model
 
     public function mahasiswas()
     {
-        return $this->belongsToMany(Mahasiswa::class, 'kegiatan_peserta')
+        return $this->belongsToMany(Mahasiswa::class , 'kegiatan_peserta')
             ->withPivot('status_presensi', 'waktu_presensi')
             ->withTimestamps();
     }

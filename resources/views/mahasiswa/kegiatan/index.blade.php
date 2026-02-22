@@ -33,7 +33,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="kegiatanList">
             @foreach($kegiatans as $kegiatan)
                 @php
-                    $isRegistered = in_array($kegiatan->id, $registeredIds);
+                    $statusDaftar = $registeredStatuses[$kegiatan->id] ?? null;
+                    $isRegistered = $statusDaftar !== null;
                 @endphp
                 <div class="kegiatan-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
                     data-nama="{{ strtolower($kegiatan->nama) }}" data-detail="{{ strtolower($kegiatan->detail ?? '') }}">
@@ -69,20 +70,42 @@
                             </a>
 
                             @if($isRegistered)
-                                <span
-                                    class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-green-500 text-white rounded-lg text-sm font-medium cursor-default">
-                                    <ion-icon name="checkmark-circle"></ion-icon>
-                                    Terdaftar
-                                </span>
+                                @if($statusDaftar === 'menunggu')
+                                    <span
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-medium cursor-default">
+                                        <ion-icon name="time-outline"></ion-icon>
+                                        Menunggu
+                                    </span>
+                                @elseif($statusDaftar === 'ditolak')
+                                    <span
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium cursor-default">
+                                        <ion-icon name="close-circle"></ion-icon>
+                                        Ditolak
+                                    </span>
+                                @else
+                                    <span
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-green-500 text-white rounded-lg text-sm font-medium cursor-default">
+                                        <ion-icon name="checkmark-circle"></ion-icon>
+                                        Terdaftar
+                                    </span>
+                                @endif
                             @elseif($kegiatan->pendaftaran === 'buka')
-                                <form action="{{ route('mahasiswa.kegiatan.daftar', $kegiatan) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    <button type="submit"
-                                        class="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
-                                        <ion-icon name="add-circle-outline"></ion-icon>
-                                        Daftar
-                                    </button>
-                                </form>
+                                @if($kegiatan->opsi_formulir)
+                                    <a href="{{ route('mahasiswa.kegiatan.form', $kegiatan) }}"
+                                        class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
+                                        <ion-icon name="document-text-outline"></ion-icon>
+                                        Isi Formulir
+                                    </a>
+                                @else
+                                    <form action="{{ route('mahasiswa.kegiatan.daftar', $kegiatan) }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <button type="submit"
+                                            class="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
+                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                            Daftar
+                                        </button>
+                                    </form>
+                                @endif
                             @else
                                 <span
                                     class="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 bg-gray-200 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed">

@@ -125,19 +125,44 @@
                         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <ion-icon name="checkmark-circle" class="text-3xl text-green-500"></ion-icon>
                         </div>
-                        <h4 class="font-medium text-gray-800 mb-1">Anda Sudah Terdaftar!</h4>
-                        <p class="text-sm text-gray-500 mb-4">Anda telah terdaftar dalam kegiatan ini.</p>
+                        <h4 class="font-medium text-gray-800 mb-1">
+                            @if($peserta && $peserta->status === 'menunggu')
+                                Menunggu Verifikasi Kemahasiswaan
+                            @elseif($peserta && $peserta->status === 'ditolak')
+                                Pendaftaran Ditolak
+                            @else
+                                Anda Sudah Terdaftar!
+                            @endif
+                        </h4>
+                        <p class="text-sm text-gray-500 mb-4">
+                            @if($peserta && $peserta->status === 'menunggu')
+                                Pendaftaran Anda sedang menunggu verifikasi dari bagian kemahasiswaan.
+                            @elseif($peserta && $peserta->status === 'ditolak')
+                                Mohon maaf, pendaftaran Anda untuk kegiatan ini ditolak.
+                            @else
+                                Anda telah terdaftar dalam kegiatan ini.
+                            @endif
+                        </p>
 
                         @if($peserta)
                             <div class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                                <p class="flex items-center justify-between mb-1">
-                                    <span>Status Presensi:</span>
-                                    <span
-                                        class="font-medium {{ $peserta->status_presensi === 'hadir' ? 'text-green-600' : 'text-amber-600' }}">
-                                        {{ $peserta->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                <p class="flex items-center justify-between mb-2">
+                                    <span>Status Pendaftaran:</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $peserta->status_badge }}">
+                                        {{ $peserta->status_label }}
                                     </span>
                                 </p>
-                                @if($peserta->waktu_presensi)
+                                <p class="flex items-center justify-between mb-1">
+                                    <span>Status Presensi:</span>
+                                    @if($kegiatan->presensi)
+                                        <span class="font-medium {{ $peserta->status_presensi === 'hadir' ? 'text-green-600' : 'text-amber-600' }}">
+                                            {{ $peserta->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-500">-</span>
+                                    @endif
+                                </p>
+                                @if($kegiatan->presensi && $peserta->waktu_presensi)
                                     <p class="text-xs text-gray-500">
                                         Presensi: {{ $peserta->waktu_presensi->format('d M Y, H:i') }}
                                     </p>
@@ -152,14 +177,22 @@
                     </div>
                 @elseif($kegiatan->pendaftaran === 'buka')
                     <p class="text-sm text-gray-500 mb-4">Daftarkan diri Anda untuk mengikuti kegiatan ini.</p>
-                    <form action="{{ route('mahasiswa.kegiatan.daftar', $kegiatan) }}" method="POST">
-                        @csrf
-                        <button type="submit"
+                    @if($kegiatan->opsi_formulir)
+                        <a href="{{ route('mahasiswa.kegiatan.form', $kegiatan) }}"
                             class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
-                            <ion-icon name="add-circle-outline" class="text-lg"></ion-icon>
-                            Daftar Sekarang
-                        </button>
-                    </form>
+                            <ion-icon name="document-text-outline" class="text-lg"></ion-icon>
+                            Isi Formulir Pendaftaran
+                        </a>
+                    @else
+                        <form action="{{ route('mahasiswa.kegiatan.daftar', $kegiatan) }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium">
+                                <ion-icon name="add-circle-outline" class="text-lg"></ion-icon>
+                                Daftar Sekarang
+                            </button>
+                        </form>
+                    @endif
                 @else
                     <div class="text-center py-4">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

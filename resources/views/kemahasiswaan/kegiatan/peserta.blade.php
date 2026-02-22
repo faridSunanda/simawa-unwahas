@@ -17,7 +17,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <div class="flex items-center gap-2 mb-2">
-                <a href="{{ route('superadmin.kegiatan.index') }}"
+                <a href="{{ route('kemahasiswaan.kegiatan.index') }}"
                     class="text-gray-400 hover:text-simawa-600 transition-colors">
                     <ion-icon name="arrow-back-outline" class="text-xl"></ion-icon>
                 </a>
@@ -26,7 +26,7 @@
             <p class="text-sm text-gray-500 mt-1">Daftar peserta yang terdaftar dalam kegiatan</p>
         </div>
         @if($kegiatan->presensi)
-        <a href="{{ route('superadmin.kegiatan.scan-presensi', $kegiatan) }}"
+        <a href="{{ route('kemahasiswaan.kegiatan.scan-presensi', $kegiatan) }}"
             class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-simawa-500 to-simawa-700 text-white rounded-lg hover:from-simawa-600 hover:to-simawa-800 transition-all text-sm font-medium shadow-sm">
             <ion-icon name="qr-code-outline"></ion-icon>
             Scan QR Presensi
@@ -113,7 +113,7 @@
                     @endif
                     <div class="mt-3 pt-3 border-t border-gray-100">
                         @if($kegiatan->presensi)
-                            <form action="{{ route('superadmin.kegiatan.peserta.presensi', $peserta) }}" method="POST">
+                            <form action="{{ route('kemahasiswaan.kegiatan.peserta.presensi', $peserta) }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 @if($peserta->status_presensi === 'hadir')
@@ -181,7 +181,7 @@
                             @endif
                             <td class="text-center">
                                 @if($kegiatan->presensi)
-                                    <form action="{{ route('superadmin.kegiatan.peserta.presensi', $peserta) }}" method="POST"
+                                    <form action="{{ route('kemahasiswaan.kegiatan.peserta.presensi', $peserta) }}" method="POST"
                                         class="inline">
                                         @csrf
                                         @method('PUT')

@@ -1,5 +1,6 @@
 @php
 use App\Models\PengajuanPrestasi;
+use App\Models\KegiatanPeserta;
 
 $actualRole = Auth::user()->role->name ?? 'user';
 $impersonatedRole = session('impersonated_role');
@@ -8,8 +9,10 @@ $roleName = Auth::user()->role->display_name ?? 'User';
 
 // Count pending verifications for superadmin/kemahasiswaan
 $pendingVerifikasiCount = 0;
+$pendingVerifikasiKegiatanCount = 0;
 if (in_array($role, ['superadmin', 'kemahasiswaan'])) {
 $pendingVerifikasiCount = PengajuanPrestasi::where('status', 'menunggu')->count();
+$pendingVerifikasiKegiatanCount = KegiatanPeserta::where('status', 'menunggu')->count();
 }
 
 // Count revisions needed for mahasiswa
@@ -116,10 +119,23 @@ $revisiCount = PengajuanPrestasi::where('mahasiswa_id', Auth::id())->where('stat
         @if($role === 'kemahasiswaan')
         <p class="text-xs text-white/50 uppercase tracking-wider mb-3 px-3 mt-6">Menu Kemahasiswaan</p>
         <ul class="space-y-1">
-            <li><a href="#" class="sidebar-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm">
-                    <ion-icon name="calendar-outline" class="text-xl"></ion-icon>Kegiatan Mahasiswa</a></li>
-            <li><a href="#" class="sidebar-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm">
-                    <ion-icon name="checkmark-done-outline" class="text-xl"></ion-icon>Verifikasi</a></li>
+            <li>
+                <a href="{{ route('kemahasiswaan.kegiatan.index') }}"
+                    class="sidebar-menu-item {{ request()->routeIs('kemahasiswaan.kegiatan.*') ? 'active' : '' }} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm">
+                    <ion-icon name="calendar-outline" class="text-xl"></ion-icon>Kegiatan Mahasiswa
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('kemahasiswaan.verifikasi-kegiatan.index') }}" 
+                   class="sidebar-menu-item {{ request()->routeIs('kemahasiswaan.verifikasi-kegiatan.*') ? 'active' : '' }} flex items-center justify-between px-3 py-2.5 rounded-lg text-sm">
+                    <span class="flex items-center gap-3">
+                        <ion-icon name="checkmark-done-outline" class="text-xl"></ion-icon>Verifikasi
+                    </span>
+                    @if($pendingVerifikasiKegiatanCount > 0)
+                    <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">{{ $pendingVerifikasiKegiatanCount }}</span>
+                    @endif
+                </a>
+            </li>
             <li><a href="#" class="sidebar-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm">
                     <ion-icon name="document-text-outline" class="text-xl"></ion-icon>Laporan</a></li>
         </ul>

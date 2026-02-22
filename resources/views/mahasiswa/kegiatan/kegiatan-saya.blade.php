@@ -47,15 +47,25 @@
                         </div>
                         <div class="p-4">
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-sm text-gray-500">Status Presensi:</span>
-                                <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_presensi === 'hadir' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                                    <ion-icon
-                                        name="{{ $record->status_presensi === 'hadir' ? 'checkmark-circle' : 'time-outline' }}"></ion-icon>
-                                    {{ $record->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                <span class="text-sm text-gray-500">Status Pendaftaran:</span>
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_badge }}">
+                                    {{ $record->status_label }}
                                 </span>
                             </div>
-                            @if($record->waktu_presensi)
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm text-gray-500">Status Presensi:</span>
+                                @if($record->kegiatan->presensi)
+                                    <span
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_presensi === 'hadir' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                                        <ion-icon
+                                            name="{{ $record->status_presensi === 'hadir' ? 'checkmark-circle' : 'time-outline' }}"></ion-icon>
+                                        {{ $record->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-500">-</span>
+                                @endif
+                            </div>
+                            @if($record->kegiatan->presensi && $record->waktu_presensi)
                                 <p class="text-xs text-gray-500">Presensi: {{ $record->waktu_presensi->format('d M Y, H:i') }}</p>
                             @endif
                             <div class="mt-3 pt-3 border-t border-gray-100">
@@ -84,6 +94,8 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Tanggal
                                 Kegiatan</th>
                             <th class="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">Status
+                                Pendaftaran</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">Status
                                 Presensi</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Waktu
                                 Presensi</th>
@@ -108,15 +120,24 @@
                                         {{ $record->kegiatan->waktu_mulai->format('d M Y') }}
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <span
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_presensi === 'hadir' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
-                                            <ion-icon
-                                                name="{{ $record->status_presensi === 'hadir' ? 'checkmark-circle' : 'time-outline' }}"></ion-icon>
-                                            {{ $record->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_badge }}">
+                                            {{ $record->status_label }}
                                         </span>
                                     </td>
+                                    <td class="px-6 py-4 text-center">
+                                        @if($record->kegiatan->presensi)
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium {{ $record->status_presensi === 'hadir' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                                                <ion-icon
+                                                    name="{{ $record->status_presensi === 'hadir' ? 'checkmark-circle' : 'time-outline' }}"></ion-icon>
+                                                {{ $record->status_presensi === 'hadir' ? 'Hadir' : 'Belum Hadir' }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-500">-</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                        {{ $record->waktu_presensi ? $record->waktu_presensi->format('d M Y, H:i') : '-' }}
+                                        {{ $record->kegiatan->presensi && $record->waktu_presensi ? $record->waktu_presensi->format('d M Y, H:i') : '-' }}
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <a href="{{ route('mahasiswa.kegiatan.show', $record->kegiatan) }}"

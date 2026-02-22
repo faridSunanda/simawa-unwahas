@@ -195,11 +195,6 @@
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Daftar Pertanyaan</label>
-                                <button type="button" onclick="addQuestion()"
-                                    class="inline-flex items-center gap-1.5 text-sm text-simawa-500 hover:text-simawa-700 font-medium">
-                                    <ion-icon name="add-circle-outline"></ion-icon>
-                                    Tambah
-                                </button>
                             </div>
 
                             <div id="questionsContainer" class="space-y-4">
@@ -213,6 +208,14 @@
                                 <button type="button" onclick="addQuestion()"
                                     class="mt-2 text-simawa-500 hover:text-simawa-700 text-sm font-medium">
                                     + Tambah Pertanyaan Pertama
+                                </button>
+                            </div>
+
+                            <div class="flex justify-center mt-4">
+                                <button type="button" onclick="addQuestion()"
+                                    class="inline-flex items-center gap-1.5 text-sm text-simawa-500 hover:text-simawa-700 font-medium">
+                                    <ion-icon name="add-circle-outline"></ion-icon>
+                                    Tambah Pertanyaan
                                 </button>
                             </div>
                         </div>

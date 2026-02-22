@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Kemahasiswaan;
 
 use App\Models\Kegiatan;
 use App\Models\KegiatanPeserta;
@@ -11,7 +11,7 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class KegiatanController extends Controller
+class KegiatanController extends \App\Http\Controllers\Controller
 {
     /**
      * Display a listing of kegiatan.
@@ -22,7 +22,7 @@ class KegiatanController extends Controller
             ->orderBy('waktu_mulai', 'desc')
             ->get();
 
-        return view('superadmin.kegiatan.index', compact('kegiatans'));
+        return view('kemahasiswaan.kegiatan.index', compact('kegiatans'));
     }
 
     /**
@@ -63,7 +63,7 @@ class KegiatanController extends Controller
             }
         }
 
-        return redirect()->route('superadmin.kegiatan.index')
+        return redirect()->route('kemahasiswaan.kegiatan.index')
             ->with('success', 'Kegiatan berhasil ditambahkan');
     }
 
@@ -116,7 +116,7 @@ class KegiatanController extends Controller
             $kegiatan->pertanyaans()->delete();
         }
 
-        return redirect()->route('superadmin.kegiatan.index')
+        return redirect()->route('kemahasiswaan.kegiatan.index')
             ->with('success', 'Kegiatan berhasil diperbarui');
     }
 
@@ -132,7 +132,7 @@ class KegiatanController extends Controller
 
         $kegiatan->delete();
 
-        return redirect()->route('superadmin.kegiatan.index')
+        return redirect()->route('kemahasiswaan.kegiatan.index')
             ->with('success', 'Kegiatan berhasil dihapus');
     }
 
@@ -143,7 +143,7 @@ class KegiatanController extends Controller
     {
         $kegiatan->load(['peserta.mahasiswa.user']);
 
-        return view('superadmin.kegiatan.peserta', compact('kegiatan'));
+        return view('kemahasiswaan.kegiatan.peserta', compact('kegiatan'));
     }
 
     /**
@@ -170,7 +170,7 @@ class KegiatanController extends Controller
     {
         $kegiatan->load(['peserta.mahasiswa.user']);
 
-        return view('superadmin.kegiatan.scan-presensi', compact('kegiatan'));
+        return view('kemahasiswaan.kegiatan.scan-presensi', compact('kegiatan'));
     }
 
     /**
@@ -232,7 +232,7 @@ class KegiatanController extends Controller
     {
         $kegiatan->load('rundowns');
 
-        return view('superadmin.kegiatan.rundown', compact('kegiatan'));
+        return view('kemahasiswaan.kegiatan.rundown', compact('kegiatan'));
     }
 
     /**
@@ -290,7 +290,7 @@ class KegiatanController extends Controller
      */
     public function sertifikat(Kegiatan $kegiatan)
     {
-        return view('superadmin.kegiatan.sertifikat', compact('kegiatan'));
+        return view('kemahasiswaan.kegiatan.sertifikat', compact('kegiatan'));
     }
 
     /**

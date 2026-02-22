@@ -20,15 +20,15 @@ class KegiatanMahasiswaController extends Controller
             ->orderBy('waktu_mulai', 'desc')
             ->get();
 
-        // Get kegiatan IDs yang sudah didaftari mahasiswa
-        $registeredIds = [];
+        // Get kegiatan IDs yang sudah didaftari mahasiswa beserta statusnya
+        $registeredStatuses = [];
         if ($mahasiswa) {
-            $registeredIds = KegiatanPeserta::where('mahasiswa_id', $mahasiswa->id)
-                ->pluck('kegiatan_id')
+            $registeredStatuses = KegiatanPeserta::where('mahasiswa_id', $mahasiswa->id)
+                ->pluck('status', 'kegiatan_id')
                 ->toArray();
         }
 
-        return view('mahasiswa.kegiatan.index', compact('kegiatans', 'registeredIds'));
+        return view('mahasiswa.kegiatan.index', compact('kegiatans', 'registeredStatuses'));
     }
 
     /**
@@ -58,6 +58,40 @@ class KegiatanMahasiswaController extends Controller
     }
 
     /**
+     * Display registration form for kegiatan with form option.
+     */
+    public function form(Kegiatan $kegiatan)
+    {
+        if (!$kegiatan->tampilkan) {
+            abort(404);
+        }
+
+        if (!$kegiatan->opsi_formulir) {
+            return redirect()->route('mahasiswa.kegiatan.show', $kegiatan);
+        }
+
+        if ($kegiatan->pendaftaran !== 'buka') {
+            return redirect()->route('mahasiswa.kegiatan.show', $kegiatan)->with('error', 'Pendaftaran untuk kegiatan ini sudah ditutup.');
+        }
+
+        $mahasiswa = auth()->user()->mahasiswa;
+
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.kegiatan.index')->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $isRegistered = KegiatanPeserta::where('kegiatan_id', $kegiatan->id)
+            ->where('mahasiswa_id', $mahasiswa->id)
+            ->exists();
+
+        if ($isRegistered) {
+            return redirect()->route('mahasiswa.kegiatan.show', $kegiatan)->with('error', 'Anda sudah terdaftar di kegiatan ini.');
+        }
+
+        return view('mahasiswa.kegiatan.form', compact('kegiatan', 'mahasiswa'));
+    }
+
+    /**
      * Register mahasiswa to kegiatan.
      */
     public function daftar(Kegiatan $kegiatan)
@@ -83,14 +117,34 @@ class KegiatanMahasiswaController extends Controller
         }
 
         // Register
-        KegiatanPeserta::create([
+        $peserta = KegiatanPeserta::create([
             'kegiatan_id' => $kegiatan->id,
             'mahasiswa_id' => $mahasiswa->id,
             'status_presensi' => 'belum_hadir',
+            'status' => 'menunggu',
         ]);
 
+        // Process formulir answers if existing
+        if ($kegiatan->opsi_formulir && request()->has('jawaban')) {
+            $jawabans = request('jawaban');
+            foreach ($jawabans as $pertanyaanId => $jawaban) {
+                // If it's a file, handle upload
+                if (request()->hasFile('jawaban.' . $pertanyaanId)) {
+                    $file = request()->file('jawaban.' . $pertanyaanId);
+                    $path = $file->store('kegiatan/jawaban', 'public');
+                    $jawaban = $path;
+                }
+
+                \App\Models\KegiatanJawabanPeserta::create([
+                    'kegiatan_peserta_id' => $peserta->id,
+                    'pertanyaan_id' => $pertanyaanId,
+                    'jawaban' => is_array($jawaban) ? json_encode($jawaban) : $jawaban,
+                ]);
+            }
+        }
+
         return redirect()->route('mahasiswa.kegiatan.saya')
-            ->with('success', 'Berhasil mendaftar ke kegiatan: ' . $kegiatan->nama);
+            ->with('success', 'Berhasil mendaftar ke kegiatan: ' . $kegiatan->nama . '. Menunggu verifikasi dari kemahasiswaan.');
     }
 
     /**
